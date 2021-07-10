@@ -21,9 +21,7 @@ function loadWidget(config) {
 			<div id="waifu-tips"></div>
 			<canvas id="live2d" width="800" height="800"></canvas>
 			<div id="waifu-tool">
-				<span class="fa fa-lg fa-comment"></span>
 				<span class="fa fa-lg fa-paper-plane"></span>
-				<span class="fa fa-lg fa-user-circle"></span>
 				<span class="fa fa-lg fa-street-view"></span>
 				<span class="fa fa-lg fa-camera-retro"></span>
 				<span class="fa fa-lg fa-times"></span>
@@ -41,7 +39,7 @@ function loadWidget(config) {
 	let userAction = false,
 		userActionTimer,
 		messageTimer,
-		messageArray = ["好久不见，日子过得好快呢……", "大坏蛋！你都多久没理人家了呀，嘤嘤嘤～", "嗨～快来逗我玩吧！", "拿小拳拳锤你胸口！", "记得把小家加入 Adblock 白名单哦！"];
+		messageArray = ["好久不见，日子过得好快呢……", "大坏蛋！你都多久没理人家了呀，嘤嘤嘤～", "嗨～快来逗我玩吧！", "拿小拳拳锤你胸口！"];
 	window.addEventListener("mousemove", () => userAction = true);
 	window.addEventListener("keydown", () => userAction = true);
 	setInterval(() => {
@@ -57,7 +55,6 @@ function loadWidget(config) {
 	}, 1000);
 
 	(function registerEventListener() {
-		document.querySelector("#waifu-tool .fa-comment").addEventListener("click", showHitokoto);
 		document.querySelector("#waifu-tool .fa-paper-plane").addEventListener("click", () => {
 			if (window.Asteroids) {
 				if (!window.ASTEROIDSPLAYERS) window.ASTEROIDSPLAYERS = [];
@@ -68,7 +65,6 @@ function loadWidget(config) {
 				document.head.appendChild(script);
 			}
 		});
-		document.querySelector("#waifu-tool .fa-user-circle").addEventListener("click", loadOtherModel);
 		document.querySelector("#waifu-tool .fa-street-view").addEventListener("click", loadRandModel);
 		document.querySelector("#waifu-tool .fa-camera-retro").addEventListener("click", () => {
 			showMessage("照好了嘛，是不是很可爱呢？", 6000, 9);
@@ -90,9 +86,6 @@ function loadWidget(config) {
 		devtools.toString = () => {
 			showMessage("哈哈，你打开了控制台，是想要看看我的小秘密吗？", 6000, 9);
 		};
-		window.addEventListener("copy", () => {
-			showMessage("你都复制了些什么呀，转载要记得加上出处哦！", 6000, 9);
-		});
 		window.addEventListener("visibilitychange", () => {
 			if (!document.hidden) showMessage("哇，你终于回来了～", 6000, 9);
 		});
@@ -123,19 +116,6 @@ function loadWidget(config) {
 		}
 		showMessage(text, 7000, 8);
 	})();
-
-	function showHitokoto() {
-		// 增加 hitokoto.cn 的 API
-		fetch("https://v1.hitokoto.cn")
-			.then(response => response.json())
-			.then(result => {
-				const text = `这句一言来自 <span>「${result.from}」</span>，是 <span>${result.creator}</span> 在 hitokoto.cn 投稿的。`;
-				showMessage(result.hitokoto, 6000, 9);
-				setTimeout(() => {
-					showMessage(text, 4000, 9);
-				}, 6000);
-			});
-	}
 
 	function showMessage(text, timeout, priority) {
 		if (!text || (sessionStorage.getItem("waifu-text") && sessionStorage.getItem("waifu-text") > priority)) return;
@@ -236,20 +216,6 @@ function loadWidget(config) {
 		}
 	}
 
-	async function loadOtherModel() {
-		let modelId = localStorage.getItem("modelId");
-		if (useCDN) {
-			if (!modelList) await loadModelList();
-			const index = (++modelId >= modelList.models.length) ? 0 : modelId;
-			loadModel(index, 0, modelList.messages[index]);
-		} else {
-			fetch(`${apiPath}switch/?id=${modelId}`)
-				.then(response => response.json())
-				.then(result => {
-					loadModel(result.model.id, 0, result.model.message);
-				});
-		}
-	}
 }
 
 function initWidget(config, apiPath) {
